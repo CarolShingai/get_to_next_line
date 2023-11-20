@@ -36,6 +36,15 @@ int	len_to_newline(t_list *list)
 	return (len);
 }
 
+t_list	*found_last_node(t_list *list)
+{
+	if (!list)
+		return (NULL);
+	while (list->next)
+		list = list->next;
+	return (list);
+}
+
 
 //after found newline is necessary store part of the buffer
 void	copy_str(t_list *list, char *str)
