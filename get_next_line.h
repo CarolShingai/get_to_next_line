@@ -27,6 +27,12 @@ struct s_list *next;
 } t_list;
 
 char	*get_next_line(int fd);
-char	*ft_strjoin(char const *s1, char const *s2);
+void	ft_create_list(t_list newlist, int fd);
+void	ft_add_newlist_to_list(t_list **list, char *buffer);
+void	copy_str(t_list *list, char *str);
+void	free_nodes(t_list list, t_list clean_node, char *buffer);
+void	rearrange_list(t_list **list);
+char	get_line(t_list list);
+int     len_to_newline(t_list *list);
 
 #endif

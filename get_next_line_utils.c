@@ -12,29 +12,74 @@
 
 #include "get_next_line.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+int	len_to_newline(t_list *list)
 {
-	size_t	idx1;
-	size_t	idx2;
-	char	*new_s;
+	int index;
+	int	len;
 
-	idx1 = 0;
-	idx2 = 0;
-	if (s1[idx1] == '\0' && s2[idx2] == '\0')
-		return (ft_strdup(""));
-	new_s = (char *)malloc ((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
-	if (!new_s)
-		return (NULL);
-	while (s1[idx1])
+	len = 0;
+	while (list)
 	{
-		new_s[idx1] = s1[idx1];
-		idx1++;
+		index = 0;
+		while (list->content[index])
+		{
+			if (list->content[index] == '\n')
+			{
+				++len;
+				return (len);
+			}
+			++index;
+			++len;
+		}
+		list = list->next;
 	}
-	while (s2[idx2])
+	return (len);
+}
+
+
+//after found newline is necessary store part of the buffer
+void	copy_str(t_list *list, char *str)
+{
+	int	index;
+	int	idx_all;
+
+	idx_all = 0;
+	while (list)
 	{
-		new_s[idx1 + idx2] = s2[idx2];
-		idx2++;
+		index = 0
+		while (list->content[index])
+		{
+			if (list->content[index] == '\n')
+			{
+				str[idx_all++] = '\n'
+				str[idx_all] = '\0'
+				return ;
+			}
+			str[idx_all++] = list->content[index++]; 
+		}
+		list = list->next;
 	}
-	new_s[idx1 + idx2] = '\0';
-	return (new_s);
+	str[idx_all] = '\0';
+}
+
+void	free_nodes(t_list list, t_list clean_node, char *buffer)
+{
+	t_list temp;
+	if (!list)
+		return ;
+	while (*list)
+	{
+		temp = *list->next;
+		free((*list)->content);
+		free(*list);
+		*list = temp;
+	}
+	*list = NULL;
+	if (clean_node->content[0])
+		*list = clean_node;
+	else
+	{
+		free(buffer);
+		free(clean_node);
+	}
 }
