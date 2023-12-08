@@ -5,90 +5,115 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: cshingai <cshingai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/11/13 16:28:14 by cshingai          #+#    #+#             */
-/*   Updated: 2023/11/15 18:57:28 by cshingai         ###   ########.fr       */
+/*   Created: 2023/12/01 19:03:53 by cshingai          #+#    #+#             */
+/*   Updated: 2023/12/08 16:50:04 by cshingai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	len_to_newline(t_list *list)
-{
-	int index;
-	int	len;
-
-	len = 0;
-	while (list)
-	{
-		index = 0;
-		while (list->content[index])
-		{
-			if (list->content[index] == '\n')
-			{
-				++len;
-				return (len);
-			}
-			++index;
-			++len;
-		}
-		list = list->next;
-	}
-	return (len);
-}
-
-t_list	*found_last_node(t_list *list)
-{
-	if (!list)
-		return (NULL);
-	while (list->next)
-		list = list->next;
-	return (list);
-}
-
-
-//after found newline is necessary store part of the buffer
-void	copy_str(t_list *list, char *str)
+char	*ft_strchr(char *str, int c)
 {
 	int	index;
-	int	idx_all;
 
-	idx_all = 0;
-	while (list)
+	index = 0;
+	while (str && str[index])
 	{
-		index = 0
-		while (list->content[index])
+		if (str[index] == (unsigned char)c)
 		{
-			if (list->content[index] == '\n')
-			{
-				str[idx_all++] = '\n'
-				str[idx_all] = '\0'
-				return ;
-			}
-			str[idx_all++] = list->content[index++]; 
+			return ((char *)&str[index]);
 		}
-		list = list->next;
+		index++;
 	}
-	str[idx_all] = '\0';
+	if ((unsigned char)c == str[index])
+		return ((char *) &str[index]);
+	return (0);
 }
 
-void	free_nodes(t_list list, t_list clean_node, char *buffer)
+char	*ft_strdup(char *c)
 {
-	t_list temp;
-	if (!list)
-		return ;
-	while (*list)
+	char	*temp;
+	int		index;
+	int		len_c;
+
+	index = 0;
+	len_c = ft_strlen(c);
+	temp = ft_calloc((len_c + 1), sizeof(char));
+	if (temp == 0)
+		return (0);
+	while (c[index])
 	{
-		temp = *list->next;
-		free((*list)->content);
-		free(*list);
-		*list = temp;
+		temp[index] = c[index];
+		index++;
 	}
-	*list = NULL;
-	if (clean_node->content[0])
-		*list = clean_node;
-	else
+	return (temp);
+}
+int	ft_strlen(const char *str)
+{
+	int	index;
+
+	index = 0;
+	while (str && str[index])
+		index++;
+	return (index);
+}
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	int	idx1;
+	int	idx2;
+	int		size_line;
+	char	*new_s;
+
+	idx1 = -1;
+	idx2 = -1;
+	size_line = ft_strlen(s1) + ft_strlen(s2);
+	new_s = ft_calloc((size_line + 1), sizeof(char));
+	if (!new_s)
+		return (NULL);
+	while (s1 && s1[++idx1])
+		new_s[idx1] = s1[idx1];
+	while (s2 && s2[++idx2])
+		new_s[idx1 + idx2] = s2[idx2];
+	return (new_s);
+}
+
+char	*ft_cpy(char *line, int pos)
+{
+	char	*line_to_return;
+	int		i;
+
+	i = 0;
+	if (!line || pos < 0)
+		return (NULL);
+	line_to_return = ft_calloc(sizeof(char), (pos + 1));
+	if (!line_to_return)
+		return (NULL);
+	while (line && line[i] && i < pos)
 	{
-		free(buffer);
-		free(clean_node);
+		line_to_return[i] = line[i];
+		i++;
 	}
+	return (line_to_return);
+}
+void	*ft_calloc(size_t n_element, size_t size)
+{
+	void	*temp;
+	size_t		total;
+	size_t		index;
+
+	index = 0;
+	total = size * n_element;
+	if ((size * n_element != 0) && (n_element * size) / size != n_element)
+		return (0);
+	temp = malloc (total);
+	if (temp != 0)
+		{
+			while (index < total)
+			{
+				((unsigned char *)temp)[index] = '\0';
+				index++;
+			}
+		}
+	return (temp);
 }
