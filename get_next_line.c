@@ -6,32 +6,31 @@
 /*   By: cshingai <cshingai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 17:49:02 by cshingai          #+#    #+#             */
-/*   Updated: 2023/12/08 20:31:13 by cshingai         ###   ########.fr       */
+/*   Updated: 2023/12/09 14:44:41 by cshingai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-
 char	*get_next_line(int fd)
 {
 	char		*line_to_return;
-	char		*line;
+	char		*full_line;
 	static char	*remainder;
 
+	if (!remainder)
+		remainder = ft_strdup("");
 	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
 	{
 		free(remainder);
 		remainder = NULL;
 		return (NULL);
 	}
-	line = ft_read_line(&remainder, fd);
-	if (!line)
-		return (NULL);
-	line_to_return = ft_build_line(line);
-	free(line);
-	return (line_to_return);
+	full_line = ft_read_line(remainder, fd);
+	line_to_return = ft_build_line(full_line);
+	remainder = get_after_first_newline(full_line);
+	free(full_line);
 	if (*line_to_return == '\0' && *remainder == '\0')
 	{
 		free(line_to_return);
@@ -42,79 +41,55 @@ char	*get_next_line(int fd)
 	return (line_to_return);
 }
 
-char	*ft_read_line(char **remainder, int fd)
+char	*ft_read_line(char *line, int fd)
 {
-	char	content[BUFFER_SIZE + 1];
-	char	*temp;
-	ssize_t	char_read;
+	char	*temp_buffer;
+	int		chars_readed;
 
-	char_read = 1;
-	while (char_read != 0)
+	chars_readed = 1;
+	temp_buffer = (char *) malloc((BUFFER_SIZE + 1) * sizeof(char));
+	while (chars_readed != 0 && ft_strchr(line, '\n') == NULL)
 	{
-		char_read = read(fd, content, BUFFER_SIZE);
-		if (char_read < 0 || (!char_read && !ft_strlen(*remainder)))
-			return (NULL);
-		content[char_read] = 0;
-		temp = ft_strjoin(*remainder, content);
-		free(*remainder);
-		*remainder = temp;
-		if (!temp)
-			return (NULL);
-		if (ft_strchr(*remainder, '\n'))
-			break ;
+		chars_readed = read(fd, temp_buffer, BUFFER_SIZE);
+		temp_buffer[chars_readed] = '\0';
+		line = ft_strjoin(line, temp_buffer);
 	}
-	return (ft_strdup(*remainder));
+	free(temp_buffer);
+	return (line);
 }
 
 char	*ft_build_line(char *line)
 {
-	int		index;
+	int		i;
+	int		size_new_line;
+	char	*new_line;
 
-	if (ft_strchr(line, '\n'))
-		index = ft_strchr(line, '\n') - line + 1;
-	else
-		index = ft_strlen(line);
-	if (!index)
-		return (NULL);
-	return (ft_cpy(line, index));
+	i = 0;
+	size_new_line = 0;
+	while (line[size_new_line] != '\0' && line[size_new_line] != '\n')
+		size_new_line++;
+	if (line[size_new_line] == '\n')
+		size_new_line += 1;
+	new_line = (char *) malloc((size_new_line + 1) * sizeof(char));
+	while (i < size_new_line)
+	{
+		new_line[i] = line[i];
+		i++;
+	}
+	new_line[i] = '\0';
+	return (new_line);
 }
 
-void	get_after_newline(char **remainder)
+char	*get_after_first_newline(char *line)
 {
-	char	*temp;
+	int		i;
+	char	*remainder_after_new_line;
 
-	if (ft_strchr(*remainder, '\n'))
-	{
-		temp = ft_strdup(ft_strchr(*remainder, '\n') + 1);
-		free(*remainder);
-		*remainder = temp;
-	}
-	else
-	{
-		free(*remainder);
-		*remainder = 0;
-	}
+	i = 0;
+	while (line[i] != '\0' && line[i] != '\n')
+		i++;
+	if (line[i] == '\n')
+		i += 1;
+	remainder_after_new_line = ft_strdup(line + i);
+	return (remainder_after_new_line);
 }
-
-// #include <fcntl.h>
-// #include <stdio.h>
-// int	main(void)
-// {
-// 	int	fd;
-// 	char	*text_line;
-// 	char	*lines;
-// 	int		i = 0;
-
-// 	fd = open("hello.txt", O_RDONLY);
-// 	while (i < 1)
-// 	{
-// 		lines = get_next_line(fd);
-// 		printf("%d |%s",i + 1, lines);
-// 		free(lines);	// if (!s1)
-// 	// 	return (ft_strdup((char *)s2));
-// 	// if (!s2)
-// 	// 	return(ft_strdup((char *)s1));
-// 		i++;
-// 	}
-// 	close(fd);
-// }
